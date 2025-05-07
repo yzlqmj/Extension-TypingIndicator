@@ -134,17 +134,39 @@ function showTypingIndicator(type, _args, dryRun) {
         return;
     }
 
-    const textContent = t`${name2} is typing...`;
+    const svgAnimation = `
+        <span class="svg_dots" style="display: inline-block; vertical-align: middle; margin-right: 3px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="16" viewBox="0 0 30 16" fill="var(--SmartThemeBodyColor)">
+                <style>
+                    .dot-fade-1 { animation: fade 1s ease-in-out 0s infinite; }
+                    .dot-fade-2 { animation: fade 1s ease-in-out 0.2s infinite; }
+                    .dot-fade-3 { animation: fade 1s ease-in-out 0.4s infinite; }
+
+                    @keyframes fade {
+                        0%, 100% { opacity: 0.2; }
+                        50% { opacity: 1; }
+                    }
+                </style>
+                <circle class="dot-fade-1" cx="5" cy="8" r="3" />
+                <circle class="dot-fade-2" cx="15" cy="8" r="3" />
+                <circle class="dot-fade-3" cx="25" cy="8" r="3" />
+            </svg>
+        </span>
+    `;
+
+    const baseText = t`${name2} is typing`;
+    const htmlContent = `${svgAnimation}${baseText}`;
+
     const existingIndicator = document.getElementById('typing_indicator');
     if (existingIndicator) {
-        existingIndicator.textContent = textContent;
+        existingIndicator.innerHTML = htmlContent;
         return;
     }
 
     const typingIndicator = document.createElement('div');
     typingIndicator.id = 'typing_indicator';
     typingIndicator.classList.add('typing_indicator');
-    typingIndicator.textContent = t`${name2} is typing`;
+    typingIndicator.innerHTML = htmlContent;
     $(typingIndicator).hide();
 
     const chat = document.getElementById('chat');

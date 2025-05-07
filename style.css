@@ -7,10 +7,8 @@
     order: 9999;
 }
 
-.typing_indicator:after {
+.typing_indicator .svg_dots {
     display: inline-block;
-    vertical-align: bottom;
-    animation: ellipsis steps(4, end) 1500ms infinite;
-    content: "";
-    width: 0px;
+    vertical-align: middle;
+    margin-left: 4px;
 }
