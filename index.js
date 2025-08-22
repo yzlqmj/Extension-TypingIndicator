@@ -168,8 +168,8 @@ function showTypingIndicator(type, _args, dryRun) {
 
     const updateIndicatorText = () => {
         const elapsedSeconds = Math.floor((Date.now() - typingStartTime) / 1000);
-        // 使用新的翻译键和 name2 (迷迭香)
-        const baseText = t`rosemary is typing for ${elapsedSeconds} seconds`;
+        // 使用新的翻译键和 name2 (角色卡名称)
+        const baseText = t`${name2} is typing for ${elapsedSeconds} seconds`;
         const htmlContent = `${svgAnimation}${baseText}`;
 
         const existingIndicator = document.getElementById('typing_indicator');

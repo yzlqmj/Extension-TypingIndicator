@@ -1,5 +1,5 @@
 {
-    "rosemary is typing for ${0} seconds": "正在輸入已經輸入${0}秒",
+    "${0} is typing for ${1} seconds": "${0} 正在輸入已經輸入${1}秒",
     "Show if streaming": "使用即時串流（Streaming）時顯示",
     "Typing Indicator": "輸入提示器"
 }
