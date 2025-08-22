@@ -12,6 +12,10 @@ import { t } from '../../../i18n.js';
 const MODULE = 'typing_indicator';
 const legacyIndicatorTemplate = document.getElementById('typing_indicator_template');
 
+// 全局变量用于计时器
+let typingTimerInterval = null;
+let typingStartTime = 0;
+
 /**
  * @typedef {Object} TypingIndicatorSettings
  * @property {boolean} enabled
@@ -156,41 +160,57 @@ function showTypingIndicator(type, _args, dryRun) {
         </span>
     `;
 
-    const baseText = t`${name2} is typing...`;
-    const htmlContent = `${svgAnimation}${baseText}`;
-
-    const existingIndicator = document.getElementById('typing_indicator');
-    if (existingIndicator) {
-        existingIndicator.innerHTML = htmlContent;
-        return;
+    // 清除旧的计时器（如果存在）
+    if (typingTimerInterval) {
+        clearInterval(typingTimerInterval);
     }
+    typingStartTime = Date.now(); // 记录开始时间
 
-    const typingIndicator = document.createElement('div');
-    typingIndicator.id = 'typing_indicator';
-    typingIndicator.classList.add('typing_indicator');
-    typingIndicator.innerHTML = htmlContent;
-    $(typingIndicator).hide();
+    const updateIndicatorText = () => {
+        const elapsedSeconds = Math.floor((Date.now() - typingStartTime) / 1000);
+        // 使用新的翻译键和 name2 (迷迭香)
+        const baseText = t`rosemary is typing for ${elapsedSeconds} seconds`;
+        const htmlContent = `${svgAnimation}${baseText}`;
 
-    const chat = document.getElementById('chat');
-    if (chat) {
-        chat.appendChild(typingIndicator);
-        const wasChatScrolledDown = Math.ceil(chat.scrollTop + chat.clientHeight) >= chat.scrollHeight;
-        $(typingIndicator).show(() => {
-            if (!wasChatScrolledDown) {
-                return;
+        const existingIndicator = document.getElementById('typing_indicator');
+        if (existingIndicator) {
+            existingIndicator.innerHTML = htmlContent;
+        } else {
+            const typingIndicator = document.createElement('div');
+            typingIndicator.id = 'typing_indicator';
+            typingIndicator.classList.add('typing_indicator');
+            typingIndicator.innerHTML = htmlContent;
+            $(typingIndicator).hide();
+
+            const chat = document.getElementById('chat');
+            if (chat) {
+                chat.appendChild(typingIndicator);
+                const wasChatScrolledDown = Math.ceil(chat.scrollTop + chat.clientHeight) >= chat.scrollHeight;
+                $(typingIndicator).show(() => {
+                    if (!wasChatScrolledDown) {
+                        return;
+                    }
+
+                    const computedStyle = getComputedStyle(typingIndicator);
+                    const bottomOffset = parseInt(computedStyle.bottom) + parseInt(computedStyle.marginBottom);
+                    chat.scrollTop += typingIndicator.clientHeight + bottomOffset;
+                });
             }
+        }
+    };
 
-            const computedStyle = getComputedStyle(typingIndicator);
-            const bottomOffset = parseInt(computedStyle.bottom) + parseInt(computedStyle.marginBottom);
-            chat.scrollTop += typingIndicator.clientHeight + bottomOffset;
-        });
-    }
+    updateIndicatorText(); // 立即显示一次
+    typingTimerInterval = setInterval(updateIndicatorText, 1000); // 每秒更新
 }
 
 /**
  * Hides the typing indicator.
  */
 function hideTypingIndicator() {
+    if (typingTimerInterval) {
+        clearInterval(typingTimerInterval);
+        typingTimerInterval = null;
+    }
     const typingIndicator = document.getElementById('typing_indicator');
     if (typingIndicator) {
         $(typingIndicator).hide(() => typingIndicator.remove());
